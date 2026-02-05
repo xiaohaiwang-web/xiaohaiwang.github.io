@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>简约游戏展示站</title>
+    <style>
+        /* 全局重置与基础样式 - 简约核心 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+        body {
+            background-color: #f8f9fa;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        /* 头部样式 */
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 400;
+            margin-bottom: 10px;
+            color: #222;
+        }
+        .subtitle {
+            color: #666;
+            font-size: 1rem;
+        }
+        /* 游戏列表容器 */
+        .game-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        /* 游戏卡片 - 简约悬浮效果 */
+        .game-card {
+            background-color: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+        }
+        .game-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .game-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-bottom: 1px solid #eee;
+        }
+        .game-card .card-info {
+            padding: 15px;
+        }
+        .game-card h3 {
+            font-size: 1.2rem;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+        .game-card p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        /* 详情页遮罩 - 初始隐藏 */
+        .detail-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+            padding: 20px;
+        }
+        /* 详情内容容器 */
+        .detail-content {
+            background-color: #fff;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 900px;
+            max-height: 90vh;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+        /* 关闭按钮 */
+        .close-btn {
+            align-self: flex-end;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: #666;
+            cursor: pointer;
+            padding: 10px 15px;
+        }
+        .close-btn:hover {
+            color: #000;
+        }
+        /* 详情内容布局 */
+        .detail-body {
+            display: flex;
+            flex-wrap: wrap;
+            padding: 0 20px 20px;
+        }
+        /* 多图预览容器 - 新增样式 */
+        .preview-img-container {
+            flex: 1;
+            min-width: 300px;
+            padding-right: 20px;
+        }
+        .preview-slider {
+            position: relative;
+            width: 100%;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .preview-slides {
+            display: flex;
+            transition: transform 0.3s ease;
+            height: 400px; /* 预览图高度 */
+        }
+        .preview-slide {
+            flex: 0 0 100%;
+            width: 100%;
+        }
+        .preview-slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+        /* 切换按钮 */
+        .slide-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: rgba(0,0,0,0.5);
+            color: #fff;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s ease;
+        }
+        .slide-btn:hover {
+            background-color: rgba(0,0,0,0.8);
+        }
+        .prev-btn {
+            left: 10px;
+        }
+        .next-btn {
+            right: 10px;
+        }
+        /* 指示器 */
+        .slide-indicators {
+            position: absolute;
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+        }
+        .indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: rgba(255,255,255,0.5);
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        .indicator.active {
+            background-color: #fff;
+        }
+        /* 游戏详情信息 */
+        .game-detail-info {
+            flex: 1;
+            min-width: 300px;
+            padding-top: 10px;
+        }
+        .game-detail-info h2 {
+            font-size: 1.8rem;
+            font-weight: 400;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        .game-detail-info p {
+            margin-bottom: 10px;
+            color: #555;
+        }
+        .game-detail-info .label {
+            font-weight: 500;
+            color: #222;
+        }
+        /* 响应式适配 */
+        @media (max-width: 768px) {
+            .detail-body {
+                flex-direction: column;
+            }
+            .preview-img-container {
+                padding-right: 0;
+                margin-bottom: 20px;
+            }
+            .preview-slides {
+                height: 300px; /* 手机端预览图高度 */
+            }
+            h1 {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 头部 -->
+    <header>
+        <h1>游戏展示馆</h1>
+        <p class="subtitle">简约风格 · 专注游戏本身</p>
+    </header>
+
+    <!-- 游戏列表 -->
+    <div class="game-list" id="gameList">
+        <!-- 游戏卡片会通过JS动态生成 -->
+    </div>
+
+    <!-- 游戏详情弹窗 -->
+    <div class="detail-modal" id="detailModal">
+        <div class="detail-content">
+            <button class="close-btn" id="closeBtn">&times;</button>
+            <div class="detail-body">
+                <!-- 多图预览区域 - 重构 -->
+                <div class="preview-img-container" id="previewImgContainer">
+                    <div class="preview-slider">
+                        <div class="preview-slides" id="previewSlides"></div>
+                        <button class="slide-btn prev-btn" id="prevBtn">&lt;</button>
+                        <button class="slide-btn next-btn" id="nextBtn">&gt;</button>
+                        <div class="slide-indicators" id="slideIndicators"></div>
+                    </div>
+                </div>
+                <div class="game-detail-info" id="gameDetailInfo">
+                    <!-- 游戏详情动态插入 -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 1. 模拟游戏数据（新增多张预览图）
+        const gameData = [
+            {
+                id: 1,
+                name: "隶属少女",
+                coverImg: "https://picsum.photos/seed/zelda1/800/600",
+                // 改为数组，存储2-3张预览图
+                previewImgs: [
+                    "./asset/games/game1.png",
+                    "https://picsum.photos/seed/zelda3/1200/800",
+                    "https://picsum.photos/seed/zelda4/1200/800"
+                ],
+                desc: "是一款带有Roguelike风格的“逆向”调教模拟游戏",
+                type: "足控m向游戏",
+                platform: "pc端"
+            },
+            {
+                id: 2,
+                name: "赛博朋克 2077",
+                coverImg: "https://picsum.photos/seed/cyber1/800/600",
+                previewImgs: [
+                    "https://picsum.photos/seed/cyber2/1200/800",
+                    "https://picsum.photos/seed/cyber3/1200/800"
+                ],
+                desc: "未来都市的角色扮演游戏，体验夜之城的爱恨情仇",
+                type: "RPG/开放世界",
+                platform: "PC/PS5/Xbox Series X/S"
+            },
+            {
+                id: 3,
+                name: "星露谷物语",
+                coverImg: "https://picsum.photos/seed/stardew1/800/600",
+                previewImgs: [
+                    "https://picsum.photos/seed/stardew2/1200/800",
+                    "https://picsum.photos/seed/stardew3/1200/800",
+                    "https://picsum.photos/seed/stardew4/1200/800"
+                ],
+                desc: "休闲农场模拟游戏，逃离都市，享受田园生活",
+                type: "模拟/休闲",
+                platform: "全平台"
+            }
+        ];
+
+        // 2. 获取DOM元素（新增多图相关元素）
+        const gameList = document.getElementById('gameList');
+        const detailModal = document.getElementById('detailModal');
+        const closeBtn = document.getElementById('closeBtn');
+        const previewSlides = document.getElementById('previewSlides');
+        const slideIndicators = document.getElementById('slideIndicators');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const gameDetailInfo = document.getElementById('gameDetailInfo');
+
+        // 全局变量：当前选中的游戏、当前预览图索引
+        let currentGame = null;
+        let currentSlideIndex = 0;
+
+        // 3. 渲染游戏列表（逻辑不变）
+        function renderGameList() {
+            gameData.forEach(game => {
+                const card = document.createElement('div');
+                card.className = 'game-card';
+                card.dataset.gameId = game.id;
+                card.innerHTML = `
+                    <img src="${game.coverImg}" alt="${game.name}封面">
+                    <div class="card-info">
+                        <h3>${game.name}</h3>
+                        <p>${game.type}</p>
+                    </div>
+                `;
+                card.addEventListener('click', () => openGameDetail(game.id));
+                gameList.appendChild(card);
+            });
+        }
+
+        // 4. 渲染预览图轮播（新增核心函数）
+        function renderPreviewSlides(game) {
+            currentGame = game;
+            currentSlideIndex = 0; // 每次打开详情重置为第一张
+
+            // 清空原有内容
+            previewSlides.innerHTML = '';
+            slideIndicators.innerHTML = '';
+
+            // 渲染预览图
+            game.previewImgs.forEach((imgUrl, index) => {
+                // 渲染图片slide
+                const slide = document.createElement('div');
+                slide.className = 'preview-slide';
+                slide.innerHTML = `<img src="${imgUrl}" alt="${game.name}预览图${index+1}">`;
+                previewSlides.appendChild(slide);
+
+                // 渲染指示器
+                const indicator = document.createElement('div');
+                indicator.className = `indicator ${index === 0 ? 'active' : ''}`;
+                indicator.dataset.index = index;
+                // 点击指示器切换图片
+                indicator.addEventListener('click', () => {
+                    currentSlideIndex = index;
+                    updateSlidePosition();
+                });
+                slideIndicators.appendChild(indicator);
+            });
+
+            // 初始化轮播位置
+            updateSlidePosition();
+        }
+
+        // 5. 更新轮播图位置（核心逻辑）
+        function updateSlidePosition() {
+            // 计算偏移量：-当前索引 * 100%
+            previewSlides.style.transform = `translateX(-${currentSlideIndex * 100}%)`;
+            
+            // 更新指示器激活状态
+            const indicators = slideIndicators.querySelectorAll('.indicator');
+            indicators.forEach((ind, index) => {
+                ind.classList.toggle('active', index === currentSlideIndex);
+            });
+        }
+
+        // 6. 切换上一张/下一张（新增函数）
+        function changeSlide(direction) {
+            if (!currentGame) return;
+            const maxIndex = currentGame.previewImgs.length - 1;
+            
+            // 下一张：索引+1，超过最大值则回到0
+            if (direction === 'next') {
+                currentSlideIndex = (currentSlideIndex + 1) > maxIndex ? 0 : currentSlideIndex + 1;
+            }
+            // 上一张：索引-1，小于0则到最大值
+            else if (direction === 'prev') {
+                currentSlideIndex = (currentSlideIndex - 1) < 0 ? maxIndex : currentSlideIndex - 1;
+            }
+
+            updateSlidePosition();
+        }
+
+        // 7. 打开游戏详情（重构）
+        function openGameDetail(gameId) {
+            const game = gameData.find(item => item.id === gameId);
+            if (!game) return;
+
+            // 渲染预览图轮播
+            renderPreviewSlides(game);
+
+            // 填充详情信息
+            gameDetailInfo.innerHTML = `
+                <h2>${game.name}</h2>
+                <p><span class="label">游戏类型：</span>${game.type}</p>
+                <p><span class="label">适配平台：</span>${game.platform}</p>
+                <p><span class="label">游戏简介：</span>${game.desc}</p>
+                <p><span class="label">预览图数量：</span>${game.previewImgs.length}张</p>
+            `;
+
+            // 显示弹窗
+            detailModal.style.display = 'flex';
+        }
+
+        // 8. 关闭详情弹窗
+        function closeGameDetail() {
+            detailModal.style.display = 'none';
+        }
+
+        // 9. 绑定事件
+        // 关闭按钮
+        closeBtn.addEventListener('click', closeGameDetail);
+        // 点击遮罩层空白处关闭
+        detailModal.addEventListener('click', (e) => {
+            if (e.target === detailModal) closeGameDetail();
+        });
+        // 轮播切换按钮
+        prevBtn.addEventListener('click', () => changeSlide('prev'));
+        nextBtn.addEventListener('click', () => changeSlide('next'));
+
+        // 初始化：渲染游戏列表
+        renderGameList();
+    </script>
+</body>
+</html>
