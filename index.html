@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>无敌mc大王的游戏资源网站</title>
+    <title>无敌mc大王的游戏网站</title>
     <style>
         /* 全局重置与基础样式 - 简约核心 */
         * {
@@ -13,17 +13,37 @@
             font-family: 'Arial', sans-serif;
         }
         body {
-            background-color: #f8f9fa;
+            /* 优化：增强颜色对比，改用椭圆径向渐变，动画更明显 */
+            background: radial-gradient(ellipse at center, #fcfcfd, #6e7c8b, #232930, #030303);
+            background-size: 200% 200%; /* 调整尺寸，让位移效果更清晰 */
+            /* 加快动画速度（10秒），新增 alternate 让动画往返更自然 */
+            animation: bgGradient 10s ease-in-out infinite alternate;
             color: #333;
             line-height: 1.6;
             padding: 20px;
+            min-height: 100vh;
+            background-attachment: fixed;
+            /* 强制优先级，避免被其他样式覆盖 */
+            background-repeat: no-repeat !important;
+        }
+        /* 优化关键帧：让径向渐变的中心点移动范围更大 */
+        @keyframes bgGradient {
+            0% {
+                background-position: 0% 0%; /* 初始：左上 */
+            }
+            50% {
+                background-position: 100% 100%; /* 中间：右下 */
+            }
+            100% {
+                background-position: 0% 100%; /* 结束：左下 */
+            }
         }
         /* 头部样式 */
         header {
             text-align: center;
             margin-bottom: 40px;
             padding-bottom: 20px;
-            border-bottom: 1px solid #eee;
+            border-bottom: 3px solid #a08888;
         }
         h1 {
             font-size: 2.2rem;
@@ -32,7 +52,7 @@
             color: #222;
         }
         .subtitle {
-            color: #666;
+            color: #ffffff;
             font-size: 1rem;
         }
         /* 游戏列表容器 */
@@ -45,7 +65,7 @@
         }
         /* 游戏卡片 - 简约悬浮效果 */
         .game-card {
-            background-color: #fff;
+            background-color: rgba(255, 255, 255, 0.85); /* 半透明，避免和背景混淆 */
             border-radius: 8px;
             overflow: hidden;
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
@@ -229,20 +249,46 @@
                 font-size: 1.8rem;
             }
         }
+        /* 头部样式 - 新增半透明方框 + 花体/行楷字体 */
+        header {
+            /* 半透明方框核心：背景+内边距+圆角+边框 */
+            background-color: rgba(255, 255, 255, 0.2); /* 白色半透明，适配渐变背景 */
+            padding: 20px 30px; /* 上下20px，左右30px内边距，撑起方框 */
+            border-radius: 12px; /* 圆角，和整体风格统一 */
+            border: 1px solid rgba(255, 255, 255, 0.3); /* 浅白色边框，增强方框感 */
+            
+            /* 原有布局样式保留 */
+            text-align: center;
+            margin: 0 auto 40px; /* 水平居中，底部间距40px */
+            max-width: 800px; /* 限制方框最大宽度，避免太宽 */
+        }
+        h1 {
+            font-size: 2.8rem; /* 字号稍放大，适配花体 */
+            font-weight: 400;
+            margin-bottom: 10px;
+            color: #222;
+            /* 优先用行楷/花体字体，兼容不同系统 */
+            font-family: "华文行楷", "STXingkai", "Brush Script MT", cursive;
+        }
+        .subtitle {
+            color: #ffffff;
+            font-size: 1.2rem;
+            /* 副标题也用花体，字号稍小 */
+            font-family: "华文行楷", "STXingkai", "Brush Script MT", cursive;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2); /* 加轻微阴影，增强可读性 */
+        }
     </style>
 </head>
 <body>
     <!-- 头部 -->
     <header>
-        <h1>资源群游戏展示</h1>
-        <p class="subtitle">欢迎大家，有问题资源群留言</p>
+        <h1>资源群游戏预览</h1>
+        <p class="subtitle">有问题可以在群里交流</p>
     </header>
-
     <!-- 游戏列表 -->
     <div class="game-list" id="gameList">
         <!-- 游戏卡片会通过JS动态生成 -->
     </div>
-
     <!-- 游戏详情弹窗 -->
     <div class="detail-modal" id="detailModal">
         <div class="detail-content">
@@ -263,19 +309,15 @@
             </div>
         </div>
     </div>
-
     <script>
         // 1. 模拟游戏数据（新增多张预览图）
         const gameData = [
             {
                 id: 1,
                 name: "隶属少女",
-                coverImg: "https://picsum.photos/seed/zelda1/800/600",
-                // 改为数组，存储2-3张预览图
+                coverImg: "./asset/games/game1-1.png",
                 previewImgs: [
-                    "./asset/games/game1.png",
-                    "https://picsum.photos/seed/zelda3/1200/800",
-                    "https://picsum.photos/seed/zelda4/1200/800"
+                    "./asset/games/game1-2.png",
                 ],
                 desc: "是一款带有Roguelike风格的“逆向”调教模拟游戏",
                 type: "足控m向游戏",
@@ -283,31 +325,81 @@
             },
             {
                 id: 2,
-                name: "赛博朋克 2077",
-                coverImg: "https://picsum.photos/seed/cyber1/800/600",
+                name: "请成为最能干的VTuber",
+                coverImg: "./asset/games/game2-1.png",
                 previewImgs: [
-                    "https://picsum.photos/seed/cyber2/1200/800",
-                    "https://picsum.photos/seed/cyber3/1200/800"
+                    "./asset/games/game2-2.png",
+                    "./asset/games/game2-3.png",
+                    "./asset/games/game2-4.png",                  
                 ],
-                desc: "未来都市的角色扮演游戏，体验夜之城的爱恨情仇",
-                type: "RPG/开放世界",
-                platform: "PC/PS5/Xbox Series X/S"
+                desc: "你是一位热爱观看VTuber直播的大学新生,在机缘巧合下进入了大山事务所成为经纪人,邂逅了三位风情各异的VTuber中之人。在接下来的一年里,请与她们并肩而行,朝着达成梦想的路途进发!",
+                type: "模拟经营,培养,换装,各种xp",
+                platform: "PC"
             },
             {
                 id: 3,
-                name: "星露谷物语",
-                coverImg: "https://picsum.photos/seed/stardew1/800/600",
+                name: "贪婪地牢",
+                coverImg: "./asset/games/game3-1.png",
                 previewImgs: [
-                    "https://picsum.photos/seed/stardew2/1200/800",
-                    "https://picsum.photos/seed/stardew3/1200/800",
-                    "https://picsum.photos/seed/stardew4/1200/800"
+                    "./asset/games/game3-2.png"
                 ],
-                desc: "休闲农场模拟游戏，逃离都市，享受田园生活",
+                desc: "在玩卡组构筑系的游戏的时候，有状态异常卡被混入手牌的事吧。在卡的规则内“被使用”，<被输>，或者，也可能会对写有“色诱”和“诱惑”等不利内容的卡片抱有“期待”。",
+                type: "[RPG 汉化 M向 魔物娘] 贪婪地牢Roguelite卡牌战斗v1.092",
+                platform: "PC"
+            },
+            {
+                id: 4,
+                name: "乡村生活：田舎",
+                coverImg: "./asset/games/game4-1.png",
+                previewImgs: [
+                ],
+                desc: "涩涩的尽头是像素",
                 type: "模拟/休闲",
+                platform: "PC"
+            },
+            {
+                id: 5,
+                name: "亵渎圣女",
+                coverImg: "./asset/games/game5-1.png",
+                previewImgs: [
+                    "./asset/games/game5-2.png",
+                    "./asset/games/game5-3.png",
+                    "./asset/games/game5-4.png"
+                ],
+                desc: "玩家运用交涉、卖花、掠夺三项互动命令，在昼夜循环的箱庭世界中，向居住于此的人们寻求协助、进行榨取、或诱惑建立肉体关系，同时为取回失去的记忆而挑战地下城。依据角色构筑存在多样的攻略路线，能够反映出玩家自由的构思进行游玩。",
+                type: "[精品RPG 汉化 换装 异种 催眠 孕 CV] 渎神圣女",
+                platform: "PC"
+            },
+            {
+                id: 6,
+                name: "妖狐直播",
+                coverImg: "./asset/games/game6-1.png",
+                previewImgs: [
+                    "./asset/games/game6-2.png",
+                    "./asset/games/game6-3.png",
+                    "./asset/games/game6-4.png",
+                    "./asset/games/game6-5.png",
+                    "./asset/games/game6-6.png",
+                    "./asset/games/game6-7.png"
+                ],
+                desc: "[精品SLG 官中 动态 全DLC 纯爱 步兵 CV] 妖狐的深夜直播 V25.09.18",
+                type: "模拟/休闲",
+                platform: "全平台"
+            },
+            {
+                id: 7,
+                name: "妻中密",
+                coverImg: "./asset/games/game7-1.png",
+                previewImgs: [
+                    "./asset/games/game7-2.png",
+                    "./asset/games/game7-3.png",
+                    "./asset/games/game7-4.png",
+                ],
+                desc: "只能我NTR别人，别人不能NTR我，我能绿别人，我的也有被挖墙脚的可能",
+                type: "SLG养成+ADV的游戏，玩家扮演男主去给别人送帽子的故事！",
                 platform: "全平台"
             }
         ];
-
         // 2. 获取DOM元素（新增多图相关元素）
         const gameList = document.getElementById('gameList');
         const detailModal = document.getElementById('detailModal');
@@ -317,11 +409,9 @@
         const prevBtn = document.getElementById('prevBtn');
         const nextBtn = document.getElementById('nextBtn');
         const gameDetailInfo = document.getElementById('gameDetailInfo');
-
         // 全局变量：当前选中的游戏、当前预览图索引
         let currentGame = null;
         let currentSlideIndex = 0;
-
         // 3. 渲染游戏列表（逻辑不变）
         function renderGameList() {
             gameData.forEach(game => {
@@ -339,16 +429,13 @@
                 gameList.appendChild(card);
             });
         }
-
         // 4. 渲染预览图轮播（新增核心函数）
         function renderPreviewSlides(game) {
             currentGame = game;
             currentSlideIndex = 0; // 每次打开详情重置为第一张
-
             // 清空原有内容
             previewSlides.innerHTML = '';
             slideIndicators.innerHTML = '';
-
             // 渲染预览图
             game.previewImgs.forEach((imgUrl, index) => {
                 // 渲染图片slide
@@ -356,7 +443,6 @@
                 slide.className = 'preview-slide';
                 slide.innerHTML = `<img src="${imgUrl}" alt="${game.name}预览图${index+1}">`;
                 previewSlides.appendChild(slide);
-
                 // 渲染指示器
                 const indicator = document.createElement('div');
                 indicator.className = `indicator ${index === 0 ? 'active' : ''}`;
@@ -368,11 +454,9 @@
                 });
                 slideIndicators.appendChild(indicator);
             });
-
             // 初始化轮播位置
             updateSlidePosition();
         }
-
         // 5. 更新轮播图位置（核心逻辑）
         function updateSlidePosition() {
             // 计算偏移量：-当前索引 * 100%
@@ -384,7 +468,6 @@
                 ind.classList.toggle('active', index === currentSlideIndex);
             });
         }
-
         // 6. 切换上一张/下一张（新增函数）
         function changeSlide(direction) {
             if (!currentGame) return;
@@ -398,18 +481,14 @@
             else if (direction === 'prev') {
                 currentSlideIndex = (currentSlideIndex - 1) < 0 ? maxIndex : currentSlideIndex - 1;
             }
-
             updateSlidePosition();
         }
-
         // 7. 打开游戏详情（重构）
         function openGameDetail(gameId) {
             const game = gameData.find(item => item.id === gameId);
             if (!game) return;
-
             // 渲染预览图轮播
             renderPreviewSlides(game);
-
             // 填充详情信息
             gameDetailInfo.innerHTML = `
                 <h2>${game.name}</h2>
@@ -418,16 +497,13 @@
                 <p><span class="label">游戏简介：</span>${game.desc}</p>
                 <p><span class="label">预览图数量：</span>${game.previewImgs.length}张</p>
             `;
-
             // 显示弹窗
             detailModal.style.display = 'flex';
         }
-
         // 8. 关闭详情弹窗
         function closeGameDetail() {
             detailModal.style.display = 'none';
         }
-
         // 9. 绑定事件
         // 关闭按钮
         closeBtn.addEventListener('click', closeGameDetail);
@@ -438,11 +514,8 @@
         // 轮播切换按钮
         prevBtn.addEventListener('click', () => changeSlide('prev'));
         nextBtn.addEventListener('click', () => changeSlide('next'));
-
         // 初始化：渲染游戏列表
         renderGameList();
     </script>
 </body>
-
 </html>
-
